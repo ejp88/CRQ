@@ -1,0 +1,22 @@
+scenario: DDoS / Availability Disruption
+description: >
+  Denial-of-service attack or cloud outage disrupts customer-facing services
+  or critical internal systems.
+threat_event_frequency:
+  min: 5
+  most_likely: 10
+  max: 20
+vulnerability:
+  # probability an attack/outage causes material customer-facing downtime
+  min: 0.10
+  most_likely: 0.18
+  max: 0.30
+loss_magnitude:
+  min: 150000
+  most_likely: 900000
+  max: 5000000
+source_notes: >
+  TEF reflects DDoS attempt frequency against similarly-sized firms and
+  cloud provider incident history. Vulnerability reflects CDN/DDoS
+  mitigation and multi-region failover maturity. Loss magnitude includes
+  lost revenue, SLA penalties, and customer churn impact.

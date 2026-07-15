@@ -1,0 +1,24 @@
+scenario: Ransomware - Corporate Network
+description: >
+  Encryption of critical systems by external ransomware actor, leading to
+  business interruption, recovery cost, and potential extortion payment.
+threat_event_frequency:
+  # events/year an actor attempts this against us
+  min: 3
+  most_likely: 6
+  max: 14
+vulnerability:
+  # probability an attempt succeeds given current controls (EDR, segmentation, backups)
+  min: 0.15
+  most_likely: 0.30
+  max: 0.50
+loss_magnitude:
+  # total loss per successful event: downtime, recovery, ransom, legal, reputational
+  min: 750000
+  most_likely: 3200000
+  max: 18000000
+source_notes: >
+  TEF benchmarked against Verizon DBIR ransomware prevalence for financial
+  services sector. Vulnerability reflects current EDR coverage (~85%) and
+  segmentation maturity. Loss magnitude derived from IBM Cost of a Data
+  Breach ransomware figures + internal BIA estimates for critical systems.

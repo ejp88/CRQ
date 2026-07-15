@@ -1,0 +1,22 @@
+scenario: Third-Party / Vendor Data Breach
+description: >
+  A critical vendor with access to sensitive data or systems is breached,
+  exposing company or customer data through the supply chain.
+threat_event_frequency:
+  min: 2
+  most_likely: 4
+  max: 9
+vulnerability:
+  # probability a vendor incident actually results in our data/systems being exposed
+  min: 0.20
+  most_likely: 0.35
+  max: 0.55
+loss_magnitude:
+  min: 400000
+  most_likely: 1800000
+  max: 12000000
+source_notes: >
+  TEF based on count of critical (tier-1) vendors with data/system access and
+  industry vendor-breach frequency benchmarks. Vulnerability reflects TPRM
+  program maturity (contractual controls, assessment cadence). Loss magnitude
+  includes notification costs, regulatory exposure, and contractual liability.

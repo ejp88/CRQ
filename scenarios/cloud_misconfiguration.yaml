@@ -1,0 +1,22 @@
+scenario: Cloud Misconfiguration Exposure
+description: >
+  A misconfigured cloud resource (storage bucket, database, IAM policy)
+  exposes sensitive data or grants unauthorized access.
+threat_event_frequency:
+  min: 6
+  most_likely: 12
+  max: 24
+vulnerability:
+  # probability a misconfiguration exists AND is discovered/exploited before remediation
+  min: 0.08
+  most_likely: 0.15
+  max: 0.28
+loss_magnitude:
+  min: 200000
+  most_likely: 1000000
+  max: 7000000
+source_notes: >
+  TEF reflects deployment velocity and cloud footprint size (accounts,
+  services). Vulnerability reflects CSPM tooling coverage and IaC review
+  gates. Loss magnitude includes breach notification, regulatory exposure,
+  and incident response costs.

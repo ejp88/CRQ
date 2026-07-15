@@ -1,0 +1,22 @@
+scenario: Insider Data Exfiltration
+description: >
+  Malicious or negligent insider (employee/contractor) exfiltrates sensitive
+  data (customer PII, IP, financial data).
+threat_event_frequency:
+  min: 4
+  most_likely: 8
+  max: 16
+vulnerability:
+  # probability an attempt/opportunity results in actual exfiltration
+  min: 0.10
+  most_likely: 0.20
+  max: 0.35
+loss_magnitude:
+  min: 250000
+  most_likely: 1200000
+  max: 8000000
+source_notes: >
+  TEF reflects headcount with privileged/sensitive data access and industry
+  insider-incident base rates. Vulnerability reflects DLP coverage, access
+  reviews, and offboarding controls. Loss magnitude includes IP loss,
+  regulatory fines, and customer notification costs.
