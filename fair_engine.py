@@ -165,6 +165,80 @@ def run_all(scenarios: Dict[str, RiskScenario], iterations: int = 10000, seed: i
 
 
 # ---------------------------------------------------------------------------
+# Empirical model: forecast from recorded (historical) loss events
+# ---------------------------------------------------------------------------
+
+MIN_EVENTS_FOR_HISTORY = 3  # fewer recorded events than this -> fall back to expert ranges
+SEVERITY_CAP_MULTIPLE = 10  # lognormal tail guard: no single event above 10x the largest recorded loss
+
+
+@dataclass
+class LossHistory:
+    """Recorded loss events for one scenario over a look-back window."""
+    name: str
+    losses: np.ndarray  # one dollar amount per recorded event (all > 0)
+    window_years: float
+
+    @property
+    def n_events(self) -> int:
+        return len(self.losses)
+
+    @property
+    def total(self) -> float:
+        return float(self.losses.sum())
+
+    @property
+    def mean(self) -> float:
+        return float(self.losses.mean())
+
+    @property
+    def largest(self) -> float:
+        return float(self.losses.max())
+
+    @property
+    def observed_rate(self) -> float:
+        """Observed loss events per year over the window."""
+        return self.n_events / self.window_years
+
+
+def run_historical_simulation(
+    history: LossHistory,
+    iterations: int = 10000,
+    seed: int = None,
+    frequency_reduction_pct: float = 0.0,
+) -> SimulationResult:
+    """
+    Forecast annual loss from recorded events.
+
+    Frequency: the true yearly event rate is uncertain with only a few years of
+    data, so each simulated year first draws a rate from Gamma(k + 0.5, 1/T)
+    (Jeffreys-prior posterior for k events observed over T years), then draws an
+    event count from Poisson(rate).
+    Severity: lognormal fitted to the recorded losses, capped at
+    SEVERITY_CAP_MULTIPLE x the largest recorded loss.
+
+    frequency_reduction_pct scales the event rate down, to model a control
+    investment (the empirical analogue of apply_remediation).
+    """
+    rng = np.random.default_rng(seed)
+
+    rate = rng.gamma(shape=history.n_events + 0.5, scale=1.0 / history.window_years, size=iterations)
+    rate = rate * (1 - frequency_reduction_pct / 100.0)
+    counts = rng.poisson(rate)
+
+    logs = np.log(history.losses)
+    mu = float(logs.mean())
+    sigma = max(float(logs.std(ddof=1)), 0.1)  # floor so identical losses don't collapse the spread
+
+    n_total = int(counts.sum())
+    severities = np.minimum(rng.lognormal(mu, sigma, n_total), history.largest * SEVERITY_CAP_MULTIPLE)
+    year_idx = np.repeat(np.arange(iterations), counts)
+    annual_losses = np.bincount(year_idx, weights=severities, minlength=iterations).astype(float)
+
+    return SimulationResult(scenario_name=history.name, annual_losses=annual_losses)
+
+
+# ---------------------------------------------------------------------------
 # Remediation tradeoff modeling
 # ---------------------------------------------------------------------------
 

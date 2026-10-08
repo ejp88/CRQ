@@ -36,8 +36,10 @@ core probabilistic reasoning that differentiates FAIR from a scorecard.
 ```
 cyber_risk_crq/
 ├── fair_engine.py        # Core FAIR math + Monte Carlo simulation engine
-├── app.py                 # Streamlit dashboard (Board / Audit / Executive views)
+├── app.py                 # Streamlit dashboard (Board / Loss Data / Audit / Executive views)
+├── loss_store.py          # Load/save/clean user-entered historical loss data
 ├── requirements.txt
+├── .streamlit/config.toml # Dark theme
 ├── scenarios/             # One YAML config per risk scenario (edit these to recalibrate)
 │   ├── ransomware.yaml
 │   ├── third_party_breach.yaml
@@ -70,6 +72,23 @@ python3 fair_engine.py
 - **Executive view** — scenario ranking plus a remediation slider: model how much a
   control investment (e.g. +25% vulnerability reduction from improved EDR coverage)
   reduces annual loss exposure, to build a defensible budget/ROI case.
+
+## Entering historical loss data (Loss Data tab)
+
+Record actual loss events in the **Loss Data** tab (date, scenario, loss amount, notes). Add rows
+with the + at the bottom of the table, paste from Excel, or delete rows, then click
+**Save & recalculate forecasts**. Every tab updates immediately.
+
+- A scenario with at least 3 events inside the look-back window (default 3 years, adjustable) is
+  forecast **from your data**. Scenarios with fewer events keep using the expert ranges in
+  `scenarios/*.yaml`, so the dashboard works with any amount of data, including none.
+- **Frequency:** Poisson, with the yearly rate itself uncertain (Gamma posterior from the number of
+  events observed over the window) so a short history produces a wider forecast.
+- **Severity:** lognormal fitted to the recorded losses, capped at 10x the largest recorded loss.
+- The Executive remediation slider reduces event frequency for data-driven scenarios.
+- Data is stored in `data/loss_history.csv` and `data/settings.json` (git-ignored, so deploying
+  with `git pull` never overwrites it). Set `CRQ_DATA_DIR` to store it elsewhere; back this
+  directory up.
 
 ## Calibrating inputs
 

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+
+# User-entered loss data lives on the server, not in git
+data/
