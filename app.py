@@ -23,7 +23,142 @@ from fair_engine import (
     run_simulation,
 )
 
-st.set_page_config(page_title="Cyber Risk Quantification Dashboard", layout="wide")
+st.set_page_config(page_title="Cyber Risk Quantification Dashboard", page_icon="🛡️", layout="wide")
+
+# ---------------------------------------------------------------------------
+# Look & feel: dark "security operations" theme
+# ---------------------------------------------------------------------------
+CYAN = "#00e5ff"
+MAGENTA = "#ff3b6b"
+GREEN = "#00ff9c"
+AMBER = "#ffb020"
+TEXT = "#e6edf3"
+MUTED = "#8b9bb4"
+GRID = "rgba(0, 229, 255, 0.10)"
+
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    html, body, [class*="css"], .stMarkdown, p, label {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+    .stApp {
+        background:
+            radial-gradient(1200px 500px at 85% -10%, rgba(0, 229, 255, 0.10), transparent 60%),
+            radial-gradient(900px 500px at -10% 110%, rgba(255, 59, 107, 0.08), transparent 60%),
+            linear-gradient(rgba(0, 229, 255, 0.035) 1px, transparent 1px) 0 0 / 44px 44px,
+            linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px) 0 0 / 44px 44px,
+            #0a0e17;
+    }
+    header[data-testid="stHeader"] { background: transparent; }
+    .block-container { padding-top: 2.2rem; max-width: 1400px; }
+
+    /* Hero header */
+    .crq-eyebrow {
+        font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.22em;
+        color: #00e5ff; text-transform: uppercase; margin-bottom: 0.2rem;
+    }
+    .crq-title {
+        font-size: 2.3rem; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 0.3rem 0;
+        background: linear-gradient(90deg, #ffffff 0%, #00e5ff 70%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .crq-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0 1.4rem 0; }
+    .crq-badge {
+        font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em;
+        color: #8b9bb4; border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 999px;
+        padding: 0.2rem 0.7rem; background: rgba(0, 229, 255, 0.05);
+    }
+    .crq-badge b { color: #00e5ff; font-weight: 600; }
+
+    /* Section headings */
+    h2, h3, [data-testid="stHeading"] h3 {
+        font-weight: 600 !important; letter-spacing: -0.005em;
+    }
+    h3::before, [data-testid="stHeading"] h3::before {
+        content: "//"; font-family: 'JetBrains Mono', monospace; color: #00e5ff; margin-right: 0.5rem;
+        opacity: 0.8;
+    }
+
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background: linear-gradient(160deg, rgba(17, 26, 43, 0.95), rgba(10, 16, 28, 0.95));
+        border: 1px solid rgba(0, 229, 255, 0.22);
+        border-left: 3px solid #00e5ff;
+        border-radius: 10px; padding: 1rem 1.1rem;
+        box-shadow: 0 0 18px rgba(0, 229, 255, 0.07), inset 0 0 24px rgba(0, 229, 255, 0.03);
+        transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        border-color: rgba(0, 229, 255, 0.6); box-shadow: 0 0 24px rgba(0, 229, 255, 0.18);
+    }
+    [data-testid="stMetricLabel"] p {
+        font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; color: #8b9bb4;
+    }
+    [data-testid="stMetricValue"] {
+        font-family: 'JetBrains Mono', 'Consolas', monospace; font-weight: 600; color: #ffffff;
+        text-shadow: 0 0 14px rgba(0, 229, 255, 0.35);
+    }
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.25rem; border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+    }
+    .stTabs [data-baseweb="tab"] {
+        font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; letter-spacing: 0.08em;
+        text-transform: uppercase; color: #8b9bb4; padding: 0.7rem 1.1rem;
+        border-radius: 8px 8px 0 0;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #00e5ff !important; background: rgba(0, 229, 255, 0.07);
+        text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+    }
+    .stTabs [data-baseweb="tab-highlight"] { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
+
+    /* Expanders, alerts, tables, charts */
+    [data-testid="stExpander"] {
+        border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 10px;
+        background: rgba(17, 26, 43, 0.6);
+    }
+    [data-testid="stExpander"] summary:hover { color: #00e5ff; }
+    [data-testid="stAlert"] {
+        background: rgba(0, 229, 255, 0.06); border: 1px solid rgba(0, 229, 255, 0.25);
+        border-radius: 10px;
+    }
+    [data-testid="stDataFrame"] {
+        border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 10px; overflow: hidden;
+    }
+    [data-testid="stPlotlyChart"] {
+        border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 12px; padding: 0.4rem;
+        background: rgba(10, 16, 28, 0.55);
+    }
+    [data-testid="stCaptionContainer"] { color: #8b9bb4; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.3); border-radius: 4px; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+def style_fig(fig, height=None, **layout):
+    """Apply the dark cyber theme to a Plotly figure."""
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Segoe UI, sans-serif", color=TEXT),
+        title_font=dict(size=15, color=TEXT),
+        hoverlabel=dict(bgcolor="#0a0e17", bordercolor=CYAN, font=dict(family="JetBrains Mono, monospace")),
+        **layout,
+    )
+    if height:
+        fig.update_layout(height=height)
+    fig.update_xaxes(gridcolor=GRID, zerolinecolor=GRID, linecolor=GRID)
+    fig.update_yaxes(gridcolor=GRID, zerolinecolor=GRID, linecolor=GRID)
+    return fig
 
 SCENARIO_DIR = os.path.join(os.path.dirname(__file__), "scenarios")
 ITERATIONS = 10000
@@ -53,13 +188,20 @@ def fmt_usd(x):
 # Header
 # ---------------------------------------------------------------------------
 
-st.title("Cyber Risk Quantification Dashboard")
-st.caption(
-    "FAIR-lite model | Monte Carlo simulation (10,000 iterations/scenario) | "
-    "Demo data — inputs are illustrative, not production figures"
+st.markdown(
+    f"""
+    <div class="crq-eyebrow">Cyber Risk Intelligence</div>
+    <div class="crq-title">Cyber Risk Quantification</div>
+    <div class="crq-badges">
+        <span class="crq-badge"><b>MODEL</b> FAIR-lite</span>
+        <span class="crq-badge"><b>ENGINE</b> Monte Carlo · {ITERATIONS:,} iterations / scenario</span>
+        <span class="crq-badge"><b>DATA</b> Demo — illustrative inputs, not production figures</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
-tab_board, tab_audit, tab_exec = st.tabs(["📊 Board View", "🔍 Audit / Methodology", "🎯 Executive View"])
+tab_board, tab_audit, tab_exec = st.tabs(["Board View", "Audit / Methodology", "Executive View"])
 
 # ---------------------------------------------------------------------------
 # BOARD VIEW
@@ -88,19 +230,20 @@ with tab_board:
             x=[r.ale_p90 - r.ale_p10],
             base=[r.ale_p10],
             orientation="h",
-            marker=dict(color="rgba(180, 40, 40, 0.55)"),
+            marker=dict(color="rgba(0, 229, 255, 0.55)", line=dict(color=CYAN, width=1.5)),
             text=f"P50: {fmt_usd(r.ale_p50)}",
             textposition="inside",
             showlegend=False,
         ))
-    fig.add_vline(x=RISK_APPETITE_THRESHOLD, line_dash="dash", line_color="black",
-                  annotation_text="Risk Appetite Threshold", annotation_position="top")
+    fig.add_vline(x=RISK_APPETITE_THRESHOLD, line_dash="dash", line_color=MAGENTA,
+                  annotation_text="Risk Appetite Threshold", annotation_position="top",
+                  annotation_font_color=MAGENTA)
     fig.update_layout(
         title="Exposure Range by Scenario (P10 – P90 band, annual $)",
         xaxis_title="Annual Loss Exposure ($)",
-        height=380,
         margin=dict(l=10, r=10, t=50, b=10),
     )
+    style_fig(fig, height=380)
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Simulated Quarterly Trend (illustrative)")
@@ -108,9 +251,15 @@ with tab_board:
     rng = np.random.default_rng(1)
     trend = total_mean * (1 + np.cumsum(rng.normal(0.02, 0.05, len(quarters)) - 0.02))
     trend_fig = go.Figure()
-    trend_fig.add_trace(go.Scatter(x=quarters, y=trend, mode="lines+markers", line=dict(color="#b42828", width=3)))
-    trend_fig.add_hline(y=RISK_APPETITE_THRESHOLD, line_dash="dash", annotation_text="Risk Appetite")
-    trend_fig.update_layout(height=300, yaxis_title="Total Mean Annual Loss ($)", margin=dict(l=10, r=10, t=20, b=10))
+    trend_fig.add_trace(go.Scatter(
+        x=quarters, y=trend, mode="lines+markers",
+        line=dict(color=CYAN, width=3), marker=dict(size=9, color="#0a0e17", line=dict(color=CYAN, width=2)),
+        fill="tozeroy", fillcolor="rgba(0, 229, 255, 0.08)",
+    ))
+    trend_fig.add_hline(y=RISK_APPETITE_THRESHOLD, line_dash="dash", line_color=MAGENTA,
+                        annotation_text="Risk Appetite", annotation_font_color=MAGENTA)
+    trend_fig.update_layout(yaxis_title="Total Mean Annual Loss ($)", margin=dict(l=10, r=10, t=20, b=10))
+    style_fig(trend_fig, height=300)
     st.plotly_chart(trend_fig, use_container_width=True)
     st.caption("Note: quarterly trend is simulated for demo purposes. In production this would pull from historical model runs.")
 
@@ -147,11 +296,15 @@ with tab_audit:
 
             thresholds, exceed_prob = r.exceedance_curve()
             curve_fig = go.Figure()
-            curve_fig.add_trace(go.Scatter(x=thresholds, y=exceed_prob, mode="lines", line=dict(color="#2b5fb4")))
+            curve_fig.add_trace(go.Scatter(
+                x=thresholds, y=exceed_prob, mode="lines", line=dict(color=CYAN, width=2.5),
+                fill="tozeroy", fillcolor="rgba(0, 229, 255, 0.08)",
+            ))
             curve_fig.update_layout(
                 title="Loss Exceedance Curve", xaxis_title="Annual Loss ($)",
-                yaxis_title="Probability of Exceeding", height=280, margin=dict(l=10, r=10, t=40, b=10),
+                yaxis_title="Probability of Exceeding", margin=dict(l=10, r=10, t=40, b=10),
             )
+            style_fig(curve_fig, height=280)
             st.plotly_chart(curve_fig, use_container_width=True)
 
     st.info(
@@ -182,9 +335,10 @@ with tab_exec:
     c3.metric("Annual Risk Reduction", fmt_usd(reduction_dollars))
 
     compare_fig = go.Figure()
-    compare_fig.add_trace(go.Bar(name="Current", x=["Mean ALE"], y=[base_result.ale_mean], marker_color="#b42828"))
-    compare_fig.add_trace(go.Bar(name="Post-Investment", x=["Mean ALE"], y=[remediated_result.ale_mean], marker_color="#2b8a3e"))
-    compare_fig.update_layout(barmode="group", height=320, margin=dict(l=10, r=10, t=20, b=10))
+    compare_fig.add_trace(go.Bar(name="Current", x=["Mean ALE"], y=[base_result.ale_mean], marker_color=MAGENTA))
+    compare_fig.add_trace(go.Bar(name="Post-Investment", x=["Mean ALE"], y=[remediated_result.ale_mean], marker_color=GREEN))
+    compare_fig.update_layout(barmode="group", margin=dict(l=10, r=10, t=20, b=10))
+    style_fig(compare_fig, height=320)
     st.plotly_chart(compare_fig, use_container_width=True)
 
     st.markdown(
